@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>NAMAL GPA & CGPA Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+            padding: 30px;
+        }
+        h1, h2 {
+            text-align: center;
+        }
+        .container {
+            max-width: 800px;
+            background: white;
+            padding: 20px;
+            margin: auto;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        input, button {
+            padding: 10px;
+            margin: 5px 0;
+            width: 100%;
+        }
+        table {
+            width: 100%;
+            margin-top: 15px;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background: #eee;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .result {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 15px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <h1>NAMAL GPA & CGPA Calculator</h1>
+
+    <h2>Semester GPA</h2>
+
+    <input type="text" id="subject" placeholder="Subject Name">
+    <input type="number" id="credits" placeholder="Credit Hours">
+    <input type="number" id="marks" placeholder="Marks / Percentage">
+
+    <button onclick="addSubject()">Add Subject</button>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Subject</th>
+                <th>Credits</th>
+                <th>Marks</th>
+                <th>Grade Points</th>
+                <th>GP × CH</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+    </table>
+
+    <button onclick="calculateSemesterGPA()">Calculate Semester GPA</button>
+
+    <div class="result" id="semesterResult"></div>
+
+    <hr>
+
+    <h2>CGPA Calculator</h2>
+
+    <input type="number" id="semesterCredits" placeholder="Total Semester Credit Hours">
+    <input type="number" id="semesterQuality" placeholder="Semester Quality Points (GPA × Credits)">
+
+    <button onclick="addSemester()">Add Semester</button>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Semester</th>
+                <th>Credits</th>
+                <th>Quality Points</th>
+            </tr>
+        </thead>
+        <tbody id="semesterTable"></tbody>
+    </table>
+
+    <button onclick="calculateCGPA()">Calculate CGPA</button>
+
+    <div class="result" id="cgpaResult"></div>
+
+</div>
+
+<script>
+    let totalQP = 0;
+    let totalCH = 0;
+
+    let semQP = 0;
+    let semCH = 0;
+    let semesterCount = 1;
+
+    function getGradePoint(marks) {
+        if (marks >= 80) return 4.0;
+        else if (marks >= 75) return 3.75;
+        else if (marks >= 70) return 3.25;
+        else if (marks >= 65) return 2.75;
+        else if (marks >= 60) return 2.0;
+        else if (marks >= 55) return 1.5;
+        else if (marks >= 50) return 1.0;
+        else return 0.0;
+    }
+
+    function addSubject() {
+        let subject = subjectInput();
+        let credits = numberValue("credits");
+        let marks = numberValue("marks");
+
+        if (!subject || credits <= 0) {
+            alert("Please fill all subject fields correctly");
+            return;
+        }
+
+        let gp = getGradePoint(marks);
+        let qp = gp * credits;
+
+        semCH += credits;
+        semQP += qp;
+
+        document.getElementById("tableBody").innerHTML += `
+            <tr>
+                <td>${subject}</td>
+                <td>${credits}</td>
+                <td>${marks}</td>
+                <td>${gp.toFixed(2)}</td>
+                <td>${qp.toFixed(2)}</td>
+            </tr>
+        `;
+
+        clearInputs();
+    }
+
+    function calculateSemesterGPA() {
+        if (semCH === 0) return;
+        let gpa = semQP / semCH;
+        document.getElementById("semesterResult").innerText =
+            `Semester GPA: ${gpa.toFixed(2)} | Quality Points: ${semQP.toFixed(2)}`;
+    }
+
+    function addSemester() {
+        let credits = numberValue("semesterCredits");
+        let quality = numberValue("semesterQuality");
+
+        if (credits <= 0 || quality <= 0) {
+            alert("Enter valid semester data");
+            return;
+        }
+
+        totalCH += credits;
+        totalQP += quality;
+
+        document.getElementById("semesterTable").innerHTML += `
+            <tr>
+                <td>Semester ${semesterCount++}</td>
+                <td>${credits}</td>
+                <td>${quality}</td>
+            </tr>
+        `;
+
+        document.getElementById("semesterCredits").value = "";
+        document.getElementById("semesterQuality").value = "";
+    }
+
+    function calculateCGPA() {
+        if (totalCH === 0) return;
+        let cgpa = totalQP / totalCH;
+        document.getElementById("cgpaResult").innerText =
+            `Final CGPA: ${cgpa.toFixed(2)}`;
+    }
+
+    function subjectInput() {
+        let s = document.getElementById("subject").value;
+        return s.trim();
+    }
+
+    function numberValue(id) {
+        return parseFloat(document.getElementById(id).value) || 0;
+    }
+
+    function clearInputs() {
+        document.getElementById("subject").value = "";
+        document.getElementById("credits").value = "";
+        document.getElementById("marks").value = "";
+    }
+</script>
+
+</body>
+</html>
+
